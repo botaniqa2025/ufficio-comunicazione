@@ -3,80 +3,431 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ufficio Comunicazione — AI Hub</title>
+  <title>Ufficio Comunicazione — Creative Studio AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --border: #334155;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --bg-base: #060b19;
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --bg-input: rgba(6, 11, 25, 0.85);
+      --border: rgba(148, 163, 184, 0.16);
+      --border-focus: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
       --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --success: #22c55e;
+      --accent-2: #0284c7;
+      --success: #10b981;
       --warn: #f59e0b;
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 900px; margin: 0 auto; }
-    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-    h1 { margin: 0; font-size: 1.4rem; color: var(--accent); }
-    .badge { font-size: 0.78rem; background: #0284c733; color: var(--accent); padding: 4px 10px; border-radius: 999px; border: 1px solid #38bdf855; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
-    label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.14), transparent 36%),
+        radial-gradient(circle at 88% 85%, rgba(2, 132, 199, 0.14), transparent 40%);
+      color: var(--text-main);
+      padding: 28px 18px 60px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #060b19;
+      box-shadow: 0 8px 24px rgba(56, 189, 248, 0.28);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #ffffff, #bae6fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .api-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      color: #6ee7b7;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .api-pill.missing {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    .api-pill:hover {
+      transform: translateY(-1px);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #bae6fd;
+      margin-bottom: 8px;
+    }
+
+    .step-num {
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 680px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
     select, input[type="text"], input[type="password"], textarea {
-      width: 100%; background: #0f172a; color: var(--text); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 12px; font-size: 0.95rem; margin-bottom: 14px;
+      width: 100%;
+      background: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+      transition: all 0.2s ease;
     }
-    select:focus, input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-    textarea { min-height: 130px; resize: vertical; line-height: 1.5; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
-    .btn {
-      background: var(--accent); color: #0f172a; font-weight: 700; border: none; border-radius: 8px;
-      padding: 12px 18px; font-size: 0.95rem; cursor: pointer; transition: 0.15s;
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
-    .btn:hover { background: var(--accent-hover); color: #fff; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-secondary { background: #334155; color: #f8fafc; font-weight: 600; padding: 8px 14px; font-size: 0.85rem; }
-    .btn-secondary:hover { background: #475569; }
-    .file-box { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; background: #0f172a88; margin-bottom: 14px; }
-    .auto-doc-banner { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.85rem; }
-    .status { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
-    .output-box { white-space: pre-wrap; line-height: 1.6; font-size: 0.96rem; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
-    .api-bar { display: flex; gap: 8px; align-items: center; }
-    .api-bar input { margin-bottom: 0; }
-    .pill-ok { color: var(--success); font-size: 0.84rem; font-weight: 600; }
-    .pill-warn { color: var(--warn); font-size: 0.84rem; }
+
+    textarea {
+      min-height: 135px;
+      resize: vertical;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    /* STATUS BANNER & FILE DROP */
+    .auto-doc-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(6, 11, 25, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 14px;
+      margin-bottom: 16px;
+      font-size: 0.84rem;
+    }
+
+    .file-drop {
+      border: 1.5px dashed rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      padding: 14px;
+      background: rgba(56, 189, 248, 0.03);
+      margin-bottom: 18px;
+      transition: 0.2s;
+    }
+
+    .file-drop:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    input[type="file"] {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: 0.15s;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: #334155;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #060b19;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 22px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(56, 189, 248, 0.45);
+      filter: brightness(1.06);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-ghost {
+      background: rgba(30, 41, 59, 0.9);
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 7px 13px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn-ghost:hover {
+      background: #334155;
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    .btn-ghost.copied {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+    }
+
+    /* API DRAWER */
+    .api-drawer {
+      display: none;
+      margin-bottom: 20px;
+    }
+
+    .api-drawer.open {
+      display: block;
+    }
+
+    .api-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* RESULTS AREA */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .results-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .engine-tag {
+      font-size: 0.76rem;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+
+    .post-cards-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .post-item {
+      background: rgba(6, 11, 25, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .post-item:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .post-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: rgba(30, 41, 59, 0.55);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-item-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #7dd3fc;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .post-item-body {
+      padding: 16px;
+      white-space: pre-wrap;
+      line-height: 1.62;
+      font-size: 0.94rem;
+      color: #f1f5f9;
+    }
+
+    .status { font-size: 0.82rem; color: var(--text-muted); margin-top: 5px; }
+    .pill-ok { color: #34d399; font-weight: 600; }
+    .pill-warn { color: #fbbf24; font-weight: 500; }
+    code { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; padding: 2px 6px; border-radius: 5px; font-size: 0.82rem; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div>
-        <h1>UFFICIO COMUNICAZIONE — AI HUB</h1>
-        <div class="status">Kit Completo Partita & Post nel tuo stile Word</div>
+      <div class="brand">
+        <div class="brand-icon">UC</div>
+        <div>
+          <h1>UFFICIO COMUNICAZIONE</h1>
+          <div class="subtitle">Creative Studio AI • Stile & Template Originali</div>
+        </div>
       </div>
-      <span class="badge">GitHub Pages + Gemini Auto-Sync</span>
+
+      <div class="header-actions">
+        <div id="apiPill" class="api-pill missing" onclick="toggleApiDrawer()">
+          <span class="dot"></span>
+          <span id="apiPillText">Configura Chiave API</span>
+        </div>
+      </div>
     </header>
 
-    <!-- CONFIGURAZIONE CHIAVE API PRIVATA NEL BROWSER -->
-    <div class="card">
-      <label>Chiave API Google AI Studio (salvata solo nel tuo browser, mai su GitHub)</label>
+    <!-- PANNELLO CHIAVE API (RICHIUDIBILE) -->
+    <div class="card api-drawer" id="apiDrawer">
+      <div class="section-label">Chiave API Google AI Studio (Privata nel tuo browser)</div>
       <div class="api-bar">
         <input type="password" id="apiKeyInput" placeholder="Incolla qui la tua chiave API (AIzaSy... o AQ....)" />
-        <button class="btn btn-secondary" onclick="salvaApiKey()">Salva Chiave</button>
+        <button class="btn-primary" style="width:auto; padding: 12px 18px; font-size: 0.9rem;" onclick="salvaApiKey()">Salva</button>
       </div>
-      <div id="apiStatus" class="status"></div>
+      <div id="apiStatus" class="status">La chiave resta salvata solo su questo dispositivo e non viene mai caricata su GitHub.</div>
     </div>
 
-    <!-- FORM OPERATIVO -->
+    <!-- WORKSPACE PRINCIPALE -->
     <div class="card">
       <div class="row">
         <div>
-          <label for="cliente">1. Cliente / Progetto</label>
+          <label class="section-label"><span class="step-num">1</span> Cliente / Progetto</label>
           <select id="cliente" onchange="caricaDocAutomatico()">
             <option value="Manfredonia Calcio 1932 — Prima Squadra" data-doc="MANFREDONIA_CALCIO_PRIMASQUADRA.docx">Manfredonia Calcio 1932 — Prima Squadra</option>
             <option value="Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)" data-doc="MANFREDONIA_CALCIO_SETTOREGIOVANILE.docx">Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)</option>
@@ -90,64 +441,85 @@
         </div>
 
         <div>
-          <label for="modalita">2. Cosa vuoi generare?</label>
+          <label class="section-label"><span class="step-num">2</span> Formato Output</label>
           <select id="modalita">
-            <option value="Kit Completo">Kit Completo (Tutti i post della partita/evento del Word)</option>
-            <option value="Post Singolo">Solo Post Singolo (Solo quello specificato negli appunti)</option>
+            <option value="Kit Completo">Kit Completo (Tutti i post della partita/evento)</option>
+            <option value="Post Singolo">Solo Post Singolo (Quello richiesto negli appunti)</option>
             <option value="Extra">Kit Completo + Concept Grafico & Prompt AI</option>
           </select>
         </div>
       </div>
 
-      <!-- STATO CARICAMENTO AUTOMATICO DA GITHUB /dati -->
+      <!-- STATO DATABASE WORD SU GITHUB -->
       <div class="auto-doc-banner" id="autoDocStatus">
-        Verifica documento cliente su GitHub in corso...
+        Verifica documento stile su GitHub in corso...
       </div>
 
-      <!-- CARICAMENTO FILE WORD (.DOCX) O TXT EXTRA DAL DISPOSITIVO -->
-      <div class="file-box">
-        <label for="fileInput">3. Allega un ulteriore File Word (.docx) o Testo (.txt) dal PC/Telefono (Opzionale)</label>
+      <!-- FILE EXTRA DAL DISPOSITIVO -->
+      <div class="file-drop">
+        <label class="section-label" style="margin-bottom: 4px;"><span class="step-num">3</span> Allega File Extra al Volo (Opzionale)</label>
         <input type="file" id="fileInput" accept=".docx,.txt,.md" onchange="leggiFileLocale(event)" />
-        <div id="fileStatus" class="status">Serve solo se hai un file extra al momento (es. distinta gara, convocati o comunicato LND).</div>
+        <div id="fileStatus" class="status">Carica distinte gara, convocati o comunicati LND in .docx / .txt se necessari per oggi.</div>
       </div>
 
-      <label for="appunti">4. Dati della Partita / Evento / Offerta</label>
+      <label class="section-label"><span class="step-num">4</span> Dati Partita / Evento / Offerta</label>
       <textarea id="appunti" placeholder="Es. serie d girone h 13^ giornata francavilla manfredonia domenica 22 novembre ore 14:30 stadio n. fittipaldi francavilla in sinni"></textarea>
 
-      <button class="btn" id="btnGenera" onclick="generaContenuto()" style="width: 100%;">Genera Tutto nel Mio Stile</button>
+      <button class="btn-primary" id="btnGenera" onclick="generaContenuto()">Genera Kit Comunicazione</button>
     </div>
 
-    <!-- RISULTATO -->
+    <!-- RISULTATI DIVISI IN SCHEDE SINGOLE -->
     <div class="card" id="resultCard" style="display:none;">
-      <div class="toolbar">
+      <div class="results-header">
         <div>
-          <strong>Kit Pronto da Copiare</strong>
-          <span id="modelUsedBadge" class="status" style="margin-left: 8px;"></span>
+          <span class="results-title">Kit Pronto</span>
+          <span id="modelUsedBadge" class="engine-tag"></span>
         </div>
-        <button class="btn btn-secondary" onclick="copiaTutto()">Copia Tutto</button>
+        <button class="btn-ghost" id="btnCopiaTutto" onclick="copiaTutto(this)">Copia Tutto il Pacchetto</button>
       </div>
-      <div class="output-box" id="outputBox"></div>
+      <div class="post-cards-grid" id="cardsContainer"></div>
     </div>
   </div>
 
   <script>
     let testoDocGithub = "";
     let testoFileLocale = "";
+    let ultimoOutputCompleto = "";
 
     window.onload = () => {
       const savedKey = localStorage.getItem("gemini_ufficio_key");
       if (savedKey) {
         document.getElementById("apiKeyInput").value = savedKey;
-        document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API caricata dalla memoria privata del browser.</span>';
+        aggiornaStatoPillApi(true);
+      } else {
+        document.getElementById("apiDrawer").classList.add("open");
+        aggiornaStatoPillApi(false);
       }
       caricaDocAutomatico();
     };
+
+    function toggleApiDrawer() {
+      document.getElementById("apiDrawer").classList.toggle("open");
+    }
+
+    function aggiornaStatoPillApi(attiva) {
+      const pill = document.getElementById("apiPill");
+      const text = document.getElementById("apiPillText");
+      if (attiva) {
+        pill.classList.remove("missing");
+        text.textContent = "API Connessa";
+      } else {
+        pill.classList.add("missing");
+        text.textContent = "Inserisci Chiave API";
+      }
+    }
 
     function salvaApiKey() {
       const val = document.getElementById("apiKeyInput").value.trim();
       if (!val) return alert("Inserisci prima una chiave API valida.");
       localStorage.setItem("gemini_ufficio_key", val);
-      document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API salvata correttamente nel browser!</span>';
+      aggiornaStatoPillApi(true);
+      document.getElementById("apiDrawer").classList.remove("open");
     }
 
     async function caricaDocAutomatico() {
@@ -158,23 +530,23 @@
       testoDocGithub = "";
 
       if (!fileName) {
-        banner.innerHTML = '<span class="status">Nessun file Word predefinito associato a questa voce.</span>';
+        banner.innerHTML = '<span class="status">Nessun file Word predefinito associato a questo cliente.</span>';
         return;
       }
 
-      banner.innerHTML = `<span class="status">Caricamento automatico di <code>dati/${fileName}</code> in corso...</span>`;
+      banner.innerHTML = `<span class="status">Sincronizzazione <code>dati/${fileName}</code> in corso...</span>`;
 
       try {
         const response = await fetch(`./dati/${encodeURIComponent(fileName)}?t=${Date.now()}`);
         if (!response.ok) {
-          banner.innerHTML = `<span class="pill-warn">File <code>dati/${fileName}</code> non ancora caricato su GitHub.</span>`;
+          banner.innerHTML = `<span class="pill-warn">File <code>dati/${fileName}</code> non ancora presente su GitHub.</span>`;
           return;
         }
 
         const arrayBuffer = await response.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         testoDocGithub = result.value.trim();
-        banner.innerHTML = `<span class="pill-ok">Database stile attivo: <code>dati/${fileName}</code> caricato (${testoDocGithub.length} caratteri).</span>`;
+        banner.innerHTML = `<span class="pill-ok">✓ Template Word attivo: <code>dati/${fileName}</code> (${testoDocGithub.length} caratteri)</span>`;
       } catch (err) {
         banner.innerHTML = `<span class="pill-warn">Impossibile leggere <code>dati/${fileName}</code>: ${err.message}</span>`;
       }
@@ -195,7 +567,7 @@
         } else {
           testoFileLocale = (await file.text()).trim();
         }
-        status.innerHTML = `<span class="pill-ok">File extra "${file.name}" aggiunto (${testoFileLocale.length} caratteri).</span>`;
+        status.innerHTML = `<span class="pill-ok">✓ File extra "${file.name}" caricato (${testoFileLocale.length} caratteri)</span>`;
       } catch (err) {
         status.textContent = "Errore nella lettura del file: " + err.message;
       }
@@ -203,19 +575,22 @@
 
     async function generaContenuto() {
       const apiKey = localStorage.getItem("gemini_ufficio_key") || document.getElementById("apiKeyInput").value.trim();
-      if (!apiKey) return alert("Incolla e salva prima la tua chiave API di Google AI Studio.");
+      if (!apiKey) {
+        document.getElementById("apiDrawer").classList.add("open");
+        return alert("Incolla e salva prima la tua chiave API di Google AI Studio.");
+      }
 
       const cliente = document.getElementById("cliente").value;
       const modalita = document.getElementById("modalita").value;
       const appunti = document.getElementById("appunti").value.trim();
 
       if (!appunti && !testoDocGithub && !testoFileLocale) {
-        return alert("Inserisci degli appunti oppure carica un file Word prima di generare.");
+        return alert("Inserisci i dati della partita/evento oppure allega un file prima di generare.");
       }
 
       const btn = document.getElementById("btnGenera");
       btn.disabled = true;
-      btn.textContent = "Generazione in corso...";
+      btn.textContent = "Generazione del kit in corso...";
 
       const prompt = `Sei l'assistente editoriale personale di Nico Troiano. Devi generare i testi seguendo FEDELMENTE gli stampi, le emoji, i separatori e gli hashtag del DOCUMENTO UFFICIALE DEL CLIENTE qui sotto.
 
@@ -264,10 +639,12 @@ REGOLE TASSATIVE (NON SGARRARE MAI):
    - Distingui automaticamente se la partita è IN CASA o IN TRASFERTA dagli appunti (es. se la prima squadra nominata non è il Manfredonia, è in trasferta) e usa i template della sezione corretta del Word!
    - Per i blocchi in cui mancano ancora dati futuri (es. Formazione, marcatori, risultato Half Time o Full Time), prepara comunque il post completo lasciando segnaposto chiari tra parentesi quadre tipo [INSERIRE FORMAZIONE], [RISULTATO PT], [CRONACA/RISULTATO FINALE] così Nico deve solo riempirli al momento!
 
-3. STILE ASCIUTTO E NESSUNA CHIACCHIERA:
+3. SEPARAZIONE DEI BLOCCHI:
+   - Separa OGNI singolo post dal successivo usando ESATTAMENTE questa riga separatrice:
+     ===BLOCCO===
+   - Non scrivere introduzioni tipo "Ecco il kit...". Parti direttamente dal primo post.
    - NON aggiungere frasi motivazionali inventate ("Testa, cuore e grinta", "Avanti tutta", ecc.) che non esistono negli esempi del Word di Nico.
-   - NON scrivere introduzioni tipo "Ecco il kit...". Parti direttamente dal primo post e separa i vari post con una riga di trattini (--------------------).
-   - Se Modalità = "Extra", aggiungi in fondo a tutto anche [CONCEPT GRAFICO] e [PROMPT IMMAGINE IN INGLESE senza testo].`;
+   - Se Modalità = "Extra", aggiungi in fondo (sempre separati da ===BLOCCO===) anche CONCEPT GRAFICO e PROMPT IMMAGINE IN INGLESE senza testo.`;
 
       try {
         const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
@@ -306,23 +683,77 @@ REGOLE TASSATIVE (NON SGARRARE MAI):
 
         if (!data) throw new Error(ultimoErrore);
 
-        const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Nessuna risposta ricevuta.";
-        document.getElementById("outputBox").textContent = outputText;
-        document.getElementById("modelUsedBadge").textContent = `(Motore: ${modelloUsato})`;
+        const outputText = (data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+        ultimoOutputCompleto = outputText.replace(/===BLOCCO===/g, "\n\n--------------------\n\n");
+        renderizzaSchede(outputText);
+
+        document.getElementById("modelUsedBadge").textContent = modelloUsato;
         document.getElementById("resultCard").style.display = "block";
         document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
       } catch (err) {
         alert("Errore: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = "Genera Tutto nel Mio Stile";
+        btn.textContent = "Genera Kit Comunicazione";
       }
     }
 
-    function copiaTutto() {
-      const testo = document.getElementById("outputBox").textContent;
-      navigator.clipboard.writeText(testo);
-      alert("Testo copiato negli appunti!");
+    function renderizzaSchede(testo) {
+      const container = document.getElementById("cardsContainer");
+      container.innerHTML = "";
+
+      // Divide per ===BLOCCO=== oppure per linee lunghe di trattini
+      let blocchi = testo.split(/===BLOCCO===|\n-{6,}\n/).map(b => b.trim()).filter(Boolean);
+      if (!blocchi.length) blocchi = [testo];
+
+      blocchi.forEach((blocco, index) => {
+        const primaRiga = blocco.split("\n")[0].replace(/[*#]/g, "").trim();
+        const titoloCard = primaRiga.length > 42 ? primaRiga.slice(0, 42) + "..." : (primaRiga || `Post #${index + 1}`);
+
+        const card = document.createElement("div");
+        card.className = "post-item";
+
+        const header = document.createElement("div");
+        header.className = "post-item-header";
+
+        const tag = document.createElement("span");
+        tag.className = "post-item-tag";
+        tag.textContent = titoloCard;
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "btn-ghost";
+        copyBtn.textContent = "Copia Post";
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(blocco);
+          copyBtn.textContent = "✓ Copiato!";
+          copyBtn.classList.add("copied");
+          setTimeout(() => {
+            copyBtn.textContent = "Copia Post";
+            copyBtn.classList.remove("copied");
+          }, 1800);
+        };
+
+        header.appendChild(tag);
+        header.appendChild(copyBtn);
+
+        const body = document.createElement("div");
+        body.className = "post-item-body";
+        body.textContent = blocco;
+
+        card.appendChild(header);
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+    }
+
+    function copiaTutto(btn) {
+      navigator.clipboard.writeText(ultimoOutputCompleto);
+      btn.textContent = "✓ Tutto Copiato!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = "Copia Tutto il Pacchetto";
+        btn.classList.remove("copied");
+      }, 1800);
     }
   </script>
 </body>
