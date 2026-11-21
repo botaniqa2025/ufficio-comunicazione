@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ufficio Comunicazione — AI Hub</title>
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    h1 { margin: 0; font-size: 1.4rem; color: var(--accent); }
+    .badge { font-size: 0.78rem; background: #0284c733; color: var(--accent); padding: 4px 10px; border-radius: 999px; border: 1px solid #38bdf855; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+    label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
+    select, input[type="text"], input[type="password"], textarea {
+      width: 100%; background: #0f172a; color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; font-size: 0.95rem; margin-bottom: 14px;
+    }
+    select:focus, input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+    textarea { min-height: 130px; resize: vertical; line-height: 1.5; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+    .btn {
+      background: var(--accent); color: #0f172a; font-weight: 700; border: none; border-radius: 8px;
+      padding: 12px 18px; font-size: 0.95rem; cursor: pointer; transition: 0.15s;
+    }
+    .btn:hover { background: var(--accent-hover); color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #334155; color: #f8fafc; font-weight: 600; padding: 8px 14px; font-size: 0.85rem; }
+    .btn-secondary:hover { background: #475569; }
+    .file-box { border: 1px dashed var(--accent); border-radius: 8px; padding: 12px; background: #0f172a88; margin-bottom: 14px; }
+    .status { font-size: 0.82rem; color: var(--muted); margin-top: 6px; }
+    .output-box { white-space: pre-wrap; line-height: 1.6; font-size: 0.96rem; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .api-bar { display: flex; gap: 8px; align-items: center; }
+    .api-bar input { margin-bottom: 0; }
+    .pill-ok { color: var(--success); font-size: 0.82rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>UFFICIO COMUNICAZIONE — AI HUB</h1>
+        <div class="status">Generatore Copy, Storie, Concept Grafici & Prompt AI</div>
+      </div>
+      <span class="badge">GitHub Pages + Gemini API</span>
+    </header>
+
+    <!-- CONFIGURAZIONE CHIAVE API PRIVATA NEL BROWSER -->
+    <div class="card">
+      <label>Chiave API Google AI Studio (salvata solo nel tuo browser, mai su GitHub)</label>
+      <div class="api-bar">
+        <input type="password" id="apiKeyInput" placeholder="Incolla qui la tua chiave API (AIzaSy... o AQ....)" />
+        <button class="btn btn-secondary" onclick="salvaApiKey()">Salva Chiave</button>
+      </div>
+      <div id="apiStatus" class="status"></div>
+    </div>
+
+    <!-- FORM OPERATIVO -->
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="cliente">1. Cliente / Progetto</label>
+          <select id="cliente">
+            <option value="Manfredonia Calcio 1932 — Prima Squadra">Manfredonia Calcio 1932 — Prima Squadra</option>
+            <option value="Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)">Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)</option>
+            <option value="Market Troiano (Manfredonia)">Market Troiano (Manfredonia)</option>
+            <option value="ASD G Events / The Cage Events">ASD G Events / The Cage Events</option>
+            <option value="Tenuta Santa Lucia">Tenuta Santa Lucia</option>
+            <option value="Tabacchi Trotta">Tabacchi Trotta</option>
+            <option value="Tucson Angel Manfredonia">Tucson Angel Manfredonia</option>
+            <option value="Altro Cliente">Altro Cliente</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="modalita">2. Modalità di Lavoro</label>
+          <select id="modalita">
+            <option value="Standard">Standard (Post + Storie — Ho già la grafica)</option>
+            <option value="Extra">Extra (Post + Storie + Concept Grafico + Prompt AI)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CARICAMENTO FILE WORD (.DOCX) O TXT -->
+      <div class="file-box">
+        <label for="fileInput">3. Allega File Word (.docx) o Testo (.txt) dal PC/Telefono (Opzionale)</label>
+        <input type="file" id="fileInput" accept=".docx,.txt,.md" onchange="leggiFileLocale(event)" />
+        <div id="fileStatus" class="status">Puoi caricare distinte, convocati, comunicati LND o listini in Word: il testo verrà estratto automaticamente.</div>
+      </div>
+
+      <!-- LETTURA FILE WORD DA CARTELLA GITHUB /dati -->
+      <div class="file-box">
+        <label for="githubDocName">Oppure carica un file Word già presente nella cartella <code>dati/</code> su GitHub (es. <code>rosa.docx</code>)</label>
+        <div class="api-bar">
+          <input type="text" id="githubDocName" placeholder="Nome esatto del file nella cartella dati/ (es. manfredonia.docx)" />
+          <button class="btn btn-secondary" onclick="caricaDocDaGithub()">Carica da GitHub</button>
+        </div>
+        <div id="githubDocStatus" class="status"></div>
+      </div>
+
+      <label for="appunti">4. Dati, Risultati, Marcatori o Appunti per il Post</label>
+      <textarea id="appunti" placeholder="Scrivi qui i dettagli (es. avversario, data, ora, stadio, marcatori, offerte della settimana, dettagli evento...)"></textarea>
+
+      <button class="btn" id="btnGenera" onclick="generaContenuto()" style="width: 100%;">Genera Pacchetto Comunicazione</button>
+    </div>
+
+    <!-- RISULTATO -->
+    <div class="card" id="resultCard" style="display:none;">
+      <div class="toolbar">
+        <strong>Risultato Pronto</strong>
+        <button class="btn btn-secondary" onclick="copiaTutto()">Copia Tutto</button>
+      </div>
+      <div class="output-box" id="outputBox"></div>
+    </div>
+  </div>
+
+  <script>
+    let testoEstrattoDaFile = "";
+
+    // Carica chiave salvata nel browser
+    window.onload = () => {
+      const savedKey = localStorage.getItem("gemini_ufficio_key");
+      if (savedKey) {
+        document.getElementById("apiKeyInput").value = savedKey;
+        document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API caricata dalla memoria privata del browser.</span>';
+      }
+    };
+
+    function salvaApiKey() {
+      const val = document.getElementById("apiKeyInput").value.trim();
+      if (!val) return alert("Inserisci prima una chiave API valida.");
+      localStorage.setItem("gemini_ufficio_key", val);
+      document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API salvata correttamente nel browser!</span>';
+    }
+
+    // Estrae testo da file .docx o .txt selezionato dal dispositivo
+    async function leggiFileLocale(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const status = document.getElementById("fileStatus");
+      status.textContent = "Lettura file in corso...";
+
+      try {
+        if (file.name.endsWith(".docx")) {
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          testoEstrattoDaFile = result.value.trim();
+        } else {
+          testoEstrattoDaFile = (await file.text()).trim();
+        }
+        status.innerHTML = `<span class="pill-ok">File "${file.name}" letto con successo (${testoEstrattoDaFile.length} caratteri estratti).</span>`;
+      } catch (err) {
+        status.textContent = "Errore nella lettura del file: " + err.message;
+      }
+    }
+
+    // Legge un file .docx o .txt dalla cartella dati/ dello stesso repository GitHub Pages
+    async function caricaDocDaGithub() {
+      const fileName = document.getElementById("githubDocName").value.trim();
+      const status = document.getElementById("githubDocStatus");
+      if (!fileName) return alert("Scrivi il nome del file presente nella cartella dati/ (es. rosa.docx)");
+
+      status.textContent = "Caricamento da GitHub dati/" + fileName + "...";
+      try {
+        const response = await fetch(`./dati/${encodeURIComponent(fileName)}`);
+        if (!response.ok) throw new Error("File non trovato in dati/" + fileName);
+
+        if (fileName.endsWith(".docx")) {
+          const arrayBuffer = await response.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          testoEstrattoDaFile += "\n\n" + result.value.trim();
+        } else {
+          const txt = await response.text();
+          testoEstrattoDaFile += "\n\n" + txt.trim();
+        }
+        status.innerHTML = `<span class="pill-ok">File "dati/${fileName}" caricato e aggiunto al contesto!</span>`;
+      } catch (err) {
+        status.textContent = "Errore: " + err.message;
+      }
+    }
+
+    async function generaContenuto() {
+      const apiKey = localStorage.getItem("gemini_ufficio_key") || document.getElementById("apiKeyInput").value.trim();
+      if (!apiKey) return alert("Incolla e salva prima la tua chiave API di Google AI Studio.");
+
+      const cliente = document.getElementById("cliente").value;
+      const modalita = document.getElementById("modalita").value;
+      const appunti = document.getElementById("appunti").value.trim();
+
+      if (!appunti && !testoEstrattoDaFile) {
+        return alert("Inserisci degli appunti oppure carica un file Word prima di generare.");
+      }
+
+      const btn = document.getElementById("btnGenera");
+      btn.disabled = true;
+      btn.textContent = "Generazione in corso con Gemini...";
+
+      const prompt = `Sei il Direttore Creativo e Senior Copywriter di Nico Troiano. Genera il pacchetto completo di comunicazione seguendo rigorosamente questi dati:
+
+- CLIENTE: ${cliente}
+- MODALITÀ OPERATIVA: ${modalita}
+- APPUNTI DIRETTI: ${appunti || "Nessun appunto aggiuntivo"}
+- CONTENUTO ESTRATTO DA DOCUMENTO WORD/TESTO:
+${testoEstrattoDaFile || "Nessun documento allegato"}
+
+REGOLE DI PRODUZIONE:
+1. Calibra tono di voce, hashtag e formato sul cliente indicato:
+   - Manfredonia Calcio 1932 — Prima Squadra: istituzionale, epico, orgoglio sipontino e biancoceleste, Stadio Miramare, Serie D Girone H.
+   - Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14): educativo, coinvolgente per le famiglie, crescita, risultati e spirito di squadra.
+   - Market Troiano (Via Gargano 148, Manfredonia): familiare, diretto, genuino, focus su qualità, salumeria e convenienza.
+   - ASD G Events / The Cage Events: dinamico, sportivo, chiaro su tornei, date e iscrizioni.
+   - Tenuta Santa Lucia / Tabacchi Trotta / Tucson Angel: elegante o diretto in base al contesto, chiaro su date, luoghi e call-to-action.
+2. Output richiesto:
+   - SE MODALITÀ = Standard: genera [1] Copy Instagram/Facebook pronto (con hook iniziale, testo, CTA, emoji bilanciate e hashtag mirati) + [2] Testo breve/impatto per Storie o locandina già esistente.
+   - SE MODALITÀ = Extra: genera [1] Copy Instagram/Facebook + [2] Testo breve per Storie + [3] Concept Grafico per Photoshop/Canva (layout, gerarchia visiva, palette e testo esatto da inserire) + [4] Prompt in inglese pronto per generare l'immagine AI (senza testo scritto dentro l'immagine).
+3. Non inventare mai orari, risultati, marcatori o dettagli non presenti nei dati forniti.`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error?.message || "Errore durante la chiamata a Gemini API");
+        }
+
+        const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Nessuna risposta ricevuta.";
+        document.getElementById("outputBox").textContent = outputText;
+        document.getElementById("resultCard").style.display = "block";
+        document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+      } catch (err) {
+        alert("Errore: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Genera Pacchetto Comunicazione";
+      }
+    }
+
+    function copiaTutto() {
+      const testo = document.getElementById("outputBox").textContent;
+      navigator.clipboard.writeText(testo);
+      alert("Testo copiato negli appunti!");
+    }
+  </script>
+</body>
+</html>
