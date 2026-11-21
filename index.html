@@ -139,7 +139,6 @@
         document.getElementById("apiKeyInput").value = savedKey;
         document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API caricata dalla memoria privata del browser.</span>';
       }
-      // Carica subito in automatico il documento del primo cliente selezionato
       caricaDocAutomatico();
     };
 
@@ -150,7 +149,6 @@
       document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API salvata correttamente nel browser!</span>';
     }
 
-    // Carica automaticamente il .docx associato al cliente dalla cartella dati/ su GitHub
     async function caricaDocAutomatico() {
       const select = document.getElementById("cliente");
       const option = select.options[select.selectedIndex];
@@ -181,7 +179,6 @@
       }
     }
 
-    // Estrae testo da un eventuale file extra selezionato dal dispositivo
     async function leggiFileLocale(event) {
       const file = event.target.files[0];
       const status = document.getElementById("fileStatus");
@@ -244,12 +241,23 @@ REGOLE DI PRODUZIONE:
 3. Non inventare mai orari, risultati, marcatori o dettagli non presenti nei dati forniti.`;
 
       try {
-        const modelli = ["gemini-3.8-flash", "gemini-3.8-flash-lite"];
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+        const listData = await listRes.json();
+        if (!listRes.ok) throw new Error(listData.error?.message || "Chiave API non valida");
+
+        const modelliDisponibili = (listData.models || [])
+          .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
+          .map(m => m.name.replace("models/", ""))
+          .filter(name => name.includes("gemini") && name.includes("flash"));
+
+        modelliDisponibili.sort((a, b) => b.localeCompare(a));
+        const listaDaProvare = modelliDisponibili.length ? modelliDisponibili : ["gemini-3.8-flash", "gemini-2.5-flash-lite"];
+
         let data = null;
         let modelloUsato = "";
         let ultimoErrore = "";
 
-        for (const modello of modelli) {
+        for (const modello of listaDaProvare) {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modello}:generateContent?key=${encodeURIComponent(apiKey)}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
