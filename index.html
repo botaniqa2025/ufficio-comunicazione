@@ -57,7 +57,7 @@
     <header>
       <div>
         <h1>UFFICIO COMUNICAZIONE — AI HUB</h1>
-        <div class="status">Generatore Copy, Storie, Concept Grafici & Prompt AI</div>
+        <div class="status">Clone fedele dei tuoi template Word + Generatore Copy</div>
       </div>
       <span class="badge">GitHub Pages + Gemini Auto-Sync</span>
     </header>
@@ -92,8 +92,8 @@
         <div>
           <label for="modalita">2. Modalità di Lavoro</label>
           <select id="modalita">
-            <option value="Standard">Standard (Post + Storie — Ho già la grafica)</option>
-            <option value="Extra">Extra (Post + Storie + Concept Grafico + Prompt AI)</option>
+            <option value="Standard">Standard (Solo Copy fedele al Word + Storie)</option>
+            <option value="Extra">Extra (Copy + Storie + Concept Grafico + Prompt AI)</option>
           </select>
         </div>
       </div>
@@ -110,17 +110,17 @@
         <div id="fileStatus" class="status">Serve solo se hai un file extra al momento (es. distinta gara o comunicato LND del giorno).</div>
       </div>
 
-      <label for="appunti">4. Dati, Risultati, Marcatori o Appunti per il Post</label>
-      <textarea id="appunti" placeholder="Scrivi qui i dettagli (es. avversario, data, ora, stadio, marcatori, offerte della settimana, dettagli evento...)"></textarea>
+      <label for="appunti">4. Tipo di Post e Dati da Inserire (es. "Next match: Francavilla - Manfredonia, 13^ giornata...")</label>
+      <textarea id="appunti" placeholder="Scrivi che post ti serve (es. Next Match, Riscaldamento, Formazione, Half Time, Full Time, Offerta) e i dati reali (squadre, giornata, data, ora, stadio, città, marcatori)..."></textarea>
 
-      <button class="btn" id="btnGenera" onclick="generaContenuto()" style="width: 100%;">Genera Pacchetto Comunicazione</button>
+      <button class="btn" id="btnGenera" onclick="generaContenuto()" style="width: 100%;">Genera Testo nel Mio Stile</button>
     </div>
 
     <!-- RISULTATO -->
     <div class="card" id="resultCard" style="display:none;">
       <div class="toolbar">
         <div>
-          <strong>Risultato Pronto</strong>
+          <strong>Testo Pronto</strong>
           <span id="modelUsedBadge" class="status" style="margin-left: 8px;"></span>
         </div>
         <button class="btn btn-secondary" onclick="copiaTutto()">Copia Tutto</button>
@@ -166,14 +166,14 @@
       try {
         const response = await fetch(`./dati/${encodeURIComponent(fileName)}?t=${Date.now()}`);
         if (!response.ok) {
-          banner.innerHTML = `<span class="pill-warn">File <code>dati/${fileName}</code> non ancora caricato su GitHub (puoi comunque generare usando gli appunti o allegando un file qui sotto).</span>`;
+          banner.innerHTML = `<span class="pill-warn">File <code>dati/${fileName}</code> non ancora caricato su GitHub.</span>`;
           return;
         }
 
         const arrayBuffer = await response.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         testoDocGithub = result.value.trim();
-        banner.innerHTML = `<span class="pill-ok">Database cliente attivo: <code>dati/${fileName}</code> caricato automaticamente (${testoDocGithub.length} caratteri).</span>`;
+        banner.innerHTML = `<span class="pill-ok">Database stile attivo: <code>dati/${fileName}</code> caricato (${testoDocGithub.length} caratteri).</span>`;
       } catch (err) {
         banner.innerHTML = `<span class="pill-warn">Impossibile leggere <code>dati/${fileName}</code>: ${err.message}</span>`;
       }
@@ -214,31 +214,32 @@
 
       const btn = document.getElementById("btnGenera");
       btn.disabled = true;
-      btn.textContent = "Generazione in corso con Gemini...";
+      btn.textContent = "Generazione in corso...";
 
-      const prompt = `Sei il Direttore Creativo e Senior Copywriter di Nico Troiano. Genera il pacchetto completo di comunicazione seguendo rigorosamente questi dati:
+      const prompt = `Sei l'assistente editoriale personale di Nico Troiano. Il tuo UNICO compito è replicare fedelmente lo stile, la struttura, le emoji, i separatori, le firme e gli hashtag esatti presenti nel DOCUMENTO UFFICIALE DEL CLIENTE qui sotto, sostituendo solo i dati variabili con quelli forniti negli APPUNTI DEL GIORNO.
 
-- CLIENTE: ${cliente}
-- MODALITÀ OPERATIVA: ${modalita}
-- APPUNTI DIRETTI DEL GIORNO: ${appunti || "Nessun appunto aggiuntivo"}
+CLIENTE: ${cliente}
+MODALITÀ: ${modalita}
 
-- DOCUMENTO UFFICIALE CLIENTE (DATABASE GITHUB):
+=== DOCUMENTO UFFICIALE DEL CLIENTE (USA QUESTO COME STAMPO ESATTO!) ===
 ${testoDocGithub || "Nessun database cliente caricato"}
+========================================================================
 
-- DOCUMENTO EXTRA ALLEGATO AL MOMENTO:
-${testoFileLocale || "Nessun file extra allegato"}
+=== DOCUMENTO EXTRA ALLEGATO ===
+${testoFileLocale || "Nessuno"}
+================================
 
-REGOLE DI PRODUZIONE:
-1. Calibra tono di voce, hashtag e formato sul cliente indicato e sulle informazioni presenti nel Documento Ufficiale Cliente:
-   - Manfredonia Calcio 1932 — Prima Squadra: istituzionale, epico, orgoglio sipontino e biancoceleste, Stadio Miramare, Serie D Girone H.
-   - Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14): educativo, coinvolgente per le famiglie, crescita, risultati e spirito di squadra.
-   - Market Troiano (Via Gargano 148, Manfredonia): familiare, diretto, genuino, focus su qualità, salumeria e convenienza.
-   - ASD G Events / The Cage Events: dinamico, sportivo, chiaro su tornei, date e iscrizioni.
-   - Tenuta Santa Lucia / Tabacchi Trotta / Tucson Angel: elegante o diretto in base al contesto, chiaro su date, luoghi e call-to-action.
-2. Output richiesto:
-   - SE MODALITÀ = Standard: genera [1] Copy Instagram/Facebook pronto (con hook iniziale, testo, CTA, emoji bilanciate e hashtag mirati) + [2] Testo breve/impatto per Storie o locandina già esistente.
-   - SE MODALITÀ = Extra: genera [1] Copy Instagram/Facebook + [2] Testo breve per Storie + [3] Concept Grafico per Photoshop/Canva (layout, gerarchia visiva, palette e testo esatto da inserire) + [4] Prompt in inglese pronto per generare l'immagine AI (senza testo scritto dentro l'immagine).
-3. Non inventare mai orari, risultati, marcatori o dettagli non presenti nei dati forniti.`;
+=== APPUNTI DEL GIORNO DA INSERIRE ===
+${appunti}
+======================================
+
+REGOLE TASSATIVE (NON VIOLARE MAI):
+1. CLONA IL TEMPLATE DEL DOCUMENTO: Cerca nel Documento Ufficiale la sezione corrispondente agli appunti (es. Next match in casa o in trasferta, Warming up / Riscaldamento, Starting XI / Formazione, Half time, Full time, Post partita, Promo/Offerta, ecc.) e COPIA LA SUA IDENTICA STRUTTURA RIGA PER RIGA, incluse le emoji esatte, i simboli, le righe vuote, la riga di firma (es. AREA COMUNICAZIONE...) e gli hashtag fissi del documento.
+2. ZERO FRASI INVENTATE O RETORICA DA AI: Non aggiungere mai frasi motivazionali generiche inventate da te (vietato scrivere cose come "Testa, cuore e grinta", "Avanti tutta", "Un nuovo capitolo", ecc.) se non sono già previste nella struttura del documento. Usa solo lo stile asciutto, diretto e cronachistico degli esempi reali presenti nel Word di Nico.
+3. DISTINGUI CASA E TRASFERTA: Se nel documento ci sono template diversi per "Partite in casa" e "Partite in trasferta", usa rigorosamente quello giusto in base agli appunti!
+4. NESSUNA INTRODUZIONE: Non scrivere "Ecco il pacchetto...", "Certamente..." o commenti. Restituisci direttamente il testo pronto da copiare.
+5. SE MODALITÀ = Standard: restituisci SOLO il testo del post principale pronto da incollare (e, se utile, una riga separata con 2 righe essenziali per la Storia).
+6. SE MODALITÀ = Extra: oltre al post principale nel suo stile esatto, aggiungi in fondo [CONCEPT GRAFICO] e [PROMPT IMMAGINE IN INGLESE senza testo].`;
 
       try {
         const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
@@ -286,7 +287,7 @@ REGOLE DI PRODUZIONE:
         alert("Errore: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = "Genera Pacchetto Comunicazione";
+        btn.textContent = "Genera Testo nel Mio Stile";
       }
     }
 
