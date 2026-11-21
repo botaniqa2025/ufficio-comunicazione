@@ -57,7 +57,7 @@
     <header>
       <div>
         <h1>UFFICIO COMUNICAZIONE — AI HUB</h1>
-        <div class="status">Clone fedele dei tuoi template Word + Generatore Copy</div>
+        <div class="status">Kit Completo Partita & Post nel tuo stile Word</div>
       </div>
       <span class="badge">GitHub Pages + Gemini Auto-Sync</span>
     </header>
@@ -90,10 +90,11 @@
         </div>
 
         <div>
-          <label for="modalita">2. Modalità di Lavoro</label>
+          <label for="modalita">2. Cosa vuoi generare?</label>
           <select id="modalita">
-            <option value="Standard">Standard (Solo Copy fedele al Word + Storie)</option>
-            <option value="Extra">Extra (Copy + Storie + Concept Grafico + Prompt AI)</option>
+            <option value="Kit Completo">Kit Completo (Tutti i post della partita/evento del Word)</option>
+            <option value="Post Singolo">Solo Post Singolo (Solo quello specificato negli appunti)</option>
+            <option value="Extra">Kit Completo + Concept Grafico & Prompt AI</option>
           </select>
         </div>
       </div>
@@ -107,20 +108,20 @@
       <div class="file-box">
         <label for="fileInput">3. Allega un ulteriore File Word (.docx) o Testo (.txt) dal PC/Telefono (Opzionale)</label>
         <input type="file" id="fileInput" accept=".docx,.txt,.md" onchange="leggiFileLocale(event)" />
-        <div id="fileStatus" class="status">Serve solo se hai un file extra al momento (es. distinta gara o comunicato LND del giorno).</div>
+        <div id="fileStatus" class="status">Serve solo se hai un file extra al momento (es. distinta gara, convocati o comunicato LND).</div>
       </div>
 
-      <label for="appunti">4. Tipo di Post e Dati da Inserire (es. "Next match: Francavilla - Manfredonia, 13^ giornata...")</label>
-      <textarea id="appunti" placeholder="Scrivi che post ti serve (es. Next Match, Riscaldamento, Formazione, Half Time, Full Time, Offerta) e i dati reali (squadre, giornata, data, ora, stadio, città, marcatori)..."></textarea>
+      <label for="appunti">4. Dati della Partita / Evento / Offerta</label>
+      <textarea id="appunti" placeholder="Es. serie d girone h 13^ giornata francavilla manfredonia domenica 22 novembre ore 14:30 stadio n. fittipaldi francavilla in sinni"></textarea>
 
-      <button class="btn" id="btnGenera" onclick="generaContenuto()" style="width: 100%;">Genera Testo nel Mio Stile</button>
+      <button class="btn" id="btnGenera" onclick="generaContenuto()" style="width: 100%;">Genera Tutto nel Mio Stile</button>
     </div>
 
     <!-- RISULTATO -->
     <div class="card" id="resultCard" style="display:none;">
       <div class="toolbar">
         <div>
-          <strong>Testo Pronto</strong>
+          <strong>Kit Pronto da Copiare</strong>
           <span id="modelUsedBadge" class="status" style="margin-left: 8px;"></span>
         </div>
         <button class="btn btn-secondary" onclick="copiaTutto()">Copia Tutto</button>
@@ -216,30 +217,57 @@
       btn.disabled = true;
       btn.textContent = "Generazione in corso...";
 
-      const prompt = `Sei l'assistente editoriale personale di Nico Troiano. Il tuo UNICO compito è replicare fedelmente lo stile, la struttura, le emoji, i separatori, le firme e gli hashtag esatti presenti nel DOCUMENTO UFFICIALE DEL CLIENTE qui sotto, sostituendo solo i dati variabili con quelli forniti negli APPUNTI DEL GIORNO.
+      const prompt = `Sei l'assistente editoriale personale di Nico Troiano. Devi generare i testi seguendo FEDELMENTE gli stampi, le emoji, i separatori e gli hashtag del DOCUMENTO UFFICIALE DEL CLIENTE qui sotto.
 
 CLIENTE: ${cliente}
 MODALITÀ: ${modalita}
 
-=== DOCUMENTO UFFICIALE DEL CLIENTE (USA QUESTO COME STAMPO ESATTO!) ===
+=== DOCUMENTO UFFICIALE DEL CLIENTE (USA TUTTI GLI STAMPI PRESENTI QUI DENTRO) ===
 ${testoDocGithub || "Nessun database cliente caricato"}
-========================================================================
+==================================================================================
 
 === DOCUMENTO EXTRA ALLEGATO ===
 ${testoFileLocale || "Nessuno"}
 ================================
 
-=== APPUNTI DEL GIORNO DA INSERIRE ===
+=== DATI / APPUNTI INSERITI DA NICO ===
 ${appunti}
 ======================================
 
-REGOLE TASSATIVE (NON VIOLARE MAI):
-1. CLONA IL TEMPLATE DEL DOCUMENTO: Cerca nel Documento Ufficiale la sezione corrispondente agli appunti (es. Next match in casa o in trasferta, Warming up / Riscaldamento, Starting XI / Formazione, Half time, Full time, Post partita, Promo/Offerta, ecc.) e COPIA LA SUA IDENTICA STRUTTURA RIGA PER RIGA, incluse le emoji esatte, i simboli, le righe vuote, la riga di firma (es. AREA COMUNICAZIONE...) e gli hashtag fissi del documento.
-2. ZERO FRASI INVENTATE O RETORICA DA AI: Non aggiungere mai frasi motivazionali generiche inventate da te (vietato scrivere cose come "Testa, cuore e grinta", "Avanti tutta", "Un nuovo capitolo", ecc.) se non sono già previste nella struttura del documento. Usa solo lo stile asciutto, diretto e cronachistico degli esempi reali presenti nel Word di Nico.
-3. DISTINGUI CASA E TRASFERTA: Se nel documento ci sono template diversi per "Partite in casa" e "Partite in trasferta", usa rigorosamente quello giusto in base agli appunti!
-4. NESSUNA INTRODUZIONE: Non scrivere "Ecco il pacchetto...", "Certamente..." o commenti. Restituisci direttamente il testo pronto da copiare.
-5. SE MODALITÀ = Standard: restituisci SOLO il testo del post principale pronto da incollare (e, se utile, una riga separata con 2 righe essenziali per la Storia).
-6. SE MODALITÀ = Extra: oltre al post principale nel suo stile esatto, aggiungi in fondo [CONCEPT GRAFICO] e [PROMPT IMMAGINE IN INGLESE senza testo].`;
+REGOLE TASSATIVE (NON SGARRARE MAI):
+1. EMOTICON OBBLIGATORIE E FEDELI: L'estrattore di Word a volte cancella le emoticon trasformandole in quadratini. Tu DEVI inserire sempre le emoticon originali di Nico al posto giusto! Ecco lo schema esatto delle emoticon usate da Nico (e mantieni ogni altra emoticon presente nel testo):
+   - Next Match:
+     NEXT MATCH 🔜 #[SquadraCasa][SquadraOspite]
+     ⚽ [X]^ giornata | Serie D - Gir. H
+     📆 [Giorno e Data] | Ore [Orario]
+     🏟️ [Nome Stadio]
+     📍 [Città]
+   - Riscaldamento:
+     🔥 WARMING UP
+     💠 Siamo in campo per il riscaldamento
+     ⬜🟦⬜🟦
+   - Formazione iniziale:
+     🐬 | STARTING XI
+   - Half Time:
+     ⏸️ | FINISCE QUI IL PRIMO TEMPO
+     ⚪ [SquadraCasa] - [SquadraOspite] [RisultatoPT]
+     ⬜🟦⬜🟦
+   - Full Time:
+     ⏹️ | FULL TIME
+   - Firma e Hashtag fissi in fondo a OGNI singolo post (esattamente come nel Word):
+     AREA COMUNICAZIONE MANFREDONIA CALCIO 1932 | S.S. 2026-2027
+     #seried #manfredonia #manfredoniacalcio #borntobebiancoceleste
+   *(Se il cliente è un altro, usa le emoji e gli hashtag specifici di quel cliente presenti nel suo documento).*
+
+2. GENERA TUTTO IL KIT COMPLETO (se Modalità = "Kit Completo" o "Extra"):
+   - NON limitarti al solo Next Match! Genera TUTTI i post previsti nel documento Word per l'evento (es. Next Match, Riscaldamento / Warming Up, Formazione / Starting XI, Half Time, Full Time, e qualsiasi altro blocco presente nel documento).
+   - Distingui automaticamente se la partita è IN CASA o IN TRASFERTA dagli appunti (es. se la prima squadra nominata non è il Manfredonia, è in trasferta) e usa i template della sezione corretta del Word!
+   - Per i blocchi in cui mancano ancora dati futuri (es. Formazione, marcatori, risultato Half Time o Full Time), prepara comunque il post completo lasciando segnaposto chiari tra parentesi quadre tipo [INSERIRE FORMAZIONE], [RISULTATO PT], [CRONACA/RISULTATO FINALE] così Nico deve solo riempirli al momento!
+
+3. STILE ASCIUTTO E NESSUNA CHIACCHIERA:
+   - NON aggiungere frasi motivazionali inventate ("Testa, cuore e grinta", "Avanti tutta", ecc.) che non esistono negli esempi del Word di Nico.
+   - NON scrivere introduzioni tipo "Ecco il kit...". Parti direttamente dal primo post e separa i vari post con una riga di trattini (--------------------).
+   - Se Modalità = "Extra", aggiungi in fondo a tutto anche [CONCEPT GRAFICO] e [PROMPT IMMAGINE IN INGLESE senza testo].`;
 
       try {
         const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
@@ -287,7 +315,7 @@ REGOLE TASSATIVE (NON VIOLARE MAI):
         alert("Errore: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = "Genera Testo nel Mio Stile";
+        btn.textContent = "Genera Tutto nel Mio Stile";
       }
     }
 
