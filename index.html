@@ -15,7 +15,7 @@
       --accent: #38bdf8;
       --accent-hover: #0284c7;
       --success: #22c55e;
-      --danger: #ef4444;
+      --warn: #f59e0b;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); padding: 20px; }
@@ -41,13 +41,15 @@
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-secondary { background: #334155; color: #f8fafc; font-weight: 600; padding: 8px 14px; font-size: 0.85rem; }
     .btn-secondary:hover { background: #475569; }
-    .file-box { border: 1px dashed var(--accent); border-radius: 8px; padding: 12px; background: #0f172a88; margin-bottom: 14px; }
-    .status { font-size: 0.82rem; color: var(--muted); margin-top: 6px; }
+    .file-box { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; background: #0f172a88; margin-bottom: 14px; }
+    .auto-doc-banner { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.85rem; }
+    .status { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
     .output-box { white-space: pre-wrap; line-height: 1.6; font-size: 0.96rem; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
     .api-bar { display: flex; gap: 8px; align-items: center; }
     .api-bar input { margin-bottom: 0; }
-    .pill-ok { color: var(--success); font-size: 0.82rem; font-weight: 600; }
+    .pill-ok { color: var(--success); font-size: 0.84rem; font-weight: 600; }
+    .pill-warn { color: var(--warn); font-size: 0.84rem; }
   </style>
 </head>
 <body>
@@ -57,7 +59,7 @@
         <h1>UFFICIO COMUNICAZIONE — AI HUB</h1>
         <div class="status">Generatore Copy, Storie, Concept Grafici & Prompt AI</div>
       </div>
-      <span class="badge">GitHub Pages + Gemini API</span>
+      <span class="badge">GitHub Pages + Gemini Auto-Sync</span>
     </header>
 
     <!-- CONFIGURAZIONE CHIAVE API PRIVATA NEL BROWSER -->
@@ -75,15 +77,15 @@
       <div class="row">
         <div>
           <label for="cliente">1. Cliente / Progetto</label>
-          <select id="cliente">
-            <option value="Manfredonia Calcio 1932 — Prima Squadra">Manfredonia Calcio 1932 — Prima Squadra</option>
-            <option value="Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)">Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)</option>
-            <option value="Market Troiano (Manfredonia)">Market Troiano (Manfredonia)</option>
-            <option value="ASD G Events / The Cage Events">ASD G Events / The Cage Events</option>
-            <option value="Tenuta Santa Lucia">Tenuta Santa Lucia</option>
-            <option value="Tabacchi Trotta">Tabacchi Trotta</option>
-            <option value="Tucson Angel Manfredonia">Tucson Angel Manfredonia</option>
-            <option value="Altro Cliente">Altro Cliente</option>
+          <select id="cliente" onchange="caricaDocAutomatico()">
+            <option value="Manfredonia Calcio 1932 — Prima Squadra" data-doc="MANFREDONIA_CALCIO_PRIMASQUADRA.docx">Manfredonia Calcio 1932 — Prima Squadra</option>
+            <option value="Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)" data-doc="MANFREDONIA_CALCIO_SETTOREGIOVANILE.docx">Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14)</option>
+            <option value="Market Troiano (Manfredonia)" data-doc="MARKET_TROIANO.docx">Market Troiano (Manfredonia)</option>
+            <option value="ASD G Events / The Cage Events" data-doc="ASD_G_EVENTS.docx">ASD G Events / The Cage Events</option>
+            <option value="Tenuta Santa Lucia" data-doc="TENUTA_SANTA_LUCIA.docx">Tenuta Santa Lucia</option>
+            <option value="Tabacchi Trotta" data-doc="TABACCHI_TROTTA.docx">Tabacchi Trotta</option>
+            <option value="Tucson Angel Manfredonia" data-doc="TUCSON_ANGEL.docx">Tucson Angel Manfredonia</option>
+            <option value="Altro Cliente" data-doc="">Altro Cliente</option>
           </select>
         </div>
 
@@ -96,21 +98,16 @@
         </div>
       </div>
 
-      <!-- CARICAMENTO FILE WORD (.DOCX) O TXT -->
-      <div class="file-box">
-        <label for="fileInput">3. Allega File Word (.docx) o Testo (.txt) dal PC/Telefono (Opzionale)</label>
-        <input type="file" id="fileInput" accept=".docx,.txt,.md" onchange="leggiFileLocale(event)" />
-        <div id="fileStatus" class="status">Puoi caricare distinte, convocati, comunicati LND o listini in Word: il testo verrà estratto automaticamente.</div>
+      <!-- STATO CARICAMENTO AUTOMATICO DA GITHUB /dati -->
+      <div class="auto-doc-banner" id="autoDocStatus">
+        Verifica documento cliente su GitHub in corso...
       </div>
 
-      <!-- LETTURA FILE WORD DA CARTELLA GITHUB /dati -->
+      <!-- CARICAMENTO FILE WORD (.DOCX) O TXT EXTRA DAL DISPOSITIVO -->
       <div class="file-box">
-        <label for="githubDocName">Oppure carica un file Word già presente nella cartella <code>dati/</code> su GitHub (es. <code>rosa.docx</code>)</label>
-        <div class="api-bar">
-          <input type="text" id="githubDocName" placeholder="Nome esatto del file nella cartella dati/ (es. manfredonia.docx)" />
-          <button class="btn btn-secondary" onclick="caricaDocDaGithub()">Carica da GitHub</button>
-        </div>
-        <div id="githubDocStatus" class="status"></div>
+        <label for="fileInput">3. Allega un ulteriore File Word (.docx) o Testo (.txt) dal PC/Telefono (Opzionale)</label>
+        <input type="file" id="fileInput" accept=".docx,.txt,.md" onchange="leggiFileLocale(event)" />
+        <div id="fileStatus" class="status">Serve solo se hai un file extra al momento (es. distinta gara o comunicato LND del giorno).</div>
       </div>
 
       <label for="appunti">4. Dati, Risultati, Marcatori o Appunti per il Post</label>
@@ -122,7 +119,10 @@
     <!-- RISULTATO -->
     <div class="card" id="resultCard" style="display:none;">
       <div class="toolbar">
-        <strong>Risultato Pronto</strong>
+        <div>
+          <strong>Risultato Pronto</strong>
+          <span id="modelUsedBadge" class="status" style="margin-left: 8px;"></span>
+        </div>
         <button class="btn btn-secondary" onclick="copiaTutto()">Copia Tutto</button>
       </div>
       <div class="output-box" id="outputBox"></div>
@@ -130,15 +130,17 @@
   </div>
 
   <script>
-    let testoEstrattoDaFile = "";
+    let testoDocGithub = "";
+    let testoFileLocale = "";
 
-    // Carica chiave salvata nel browser
     window.onload = () => {
       const savedKey = localStorage.getItem("gemini_ufficio_key");
       if (savedKey) {
         document.getElementById("apiKeyInput").value = savedKey;
         document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API caricata dalla memoria privata del browser.</span>';
       }
+      // Carica subito in automatico il documento del primo cliente selezionato
+      caricaDocAutomatico();
     };
 
     function salvaApiKey() {
@@ -148,49 +150,56 @@
       document.getElementById("apiStatus").innerHTML = '<span class="pill-ok">Chiave API salvata correttamente nel browser!</span>';
     }
 
-    // Estrae testo da file .docx o .txt selezionato dal dispositivo
+    // Carica automaticamente il .docx associato al cliente dalla cartella dati/ su GitHub
+    async function caricaDocAutomatico() {
+      const select = document.getElementById("cliente");
+      const option = select.options[select.selectedIndex];
+      const fileName = option.getAttribute("data-doc");
+      const banner = document.getElementById("autoDocStatus");
+      testoDocGithub = "";
+
+      if (!fileName) {
+        banner.innerHTML = '<span class="status">Nessun file Word predefinito associato a questa voce.</span>';
+        return;
+      }
+
+      banner.innerHTML = `<span class="status">Caricamento automatico di <code>dati/${fileName}</code> in corso...</span>`;
+
+      try {
+        const response = await fetch(`./dati/${encodeURIComponent(fileName)}?t=${Date.now()}`);
+        if (!response.ok) {
+          banner.innerHTML = `<span class="pill-warn">File <code>dati/${fileName}</code> non ancora caricato su GitHub (puoi comunque generare usando gli appunti o allegando un file qui sotto).</span>`;
+          return;
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        testoDocGithub = result.value.trim();
+        banner.innerHTML = `<span class="pill-ok">Database cliente attivo: <code>dati/${fileName}</code> caricato automaticamente (${testoDocGithub.length} caratteri).</span>`;
+      } catch (err) {
+        banner.innerHTML = `<span class="pill-warn">Impossibile leggere <code>dati/${fileName}</code>: ${err.message}</span>`;
+      }
+    }
+
+    // Estrae testo da un eventuale file extra selezionato dal dispositivo
     async function leggiFileLocale(event) {
       const file = event.target.files[0];
-      if (!file) return;
       const status = document.getElementById("fileStatus");
-      status.textContent = "Lettura file in corso...";
+      testoFileLocale = "";
+      if (!file) return;
 
+      status.textContent = "Lettura file extra in corso...";
       try {
         if (file.name.endsWith(".docx")) {
           const arrayBuffer = await file.arrayBuffer();
           const result = await mammoth.extractRawText({ arrayBuffer });
-          testoEstrattoDaFile = result.value.trim();
+          testoFileLocale = result.value.trim();
         } else {
-          testoEstrattoDaFile = (await file.text()).trim();
+          testoFileLocale = (await file.text()).trim();
         }
-        status.innerHTML = `<span class="pill-ok">File "${file.name}" letto con successo (${testoEstrattoDaFile.length} caratteri estratti).</span>`;
+        status.innerHTML = `<span class="pill-ok">File extra "${file.name}" aggiunto (${testoFileLocale.length} caratteri).</span>`;
       } catch (err) {
         status.textContent = "Errore nella lettura del file: " + err.message;
-      }
-    }
-
-    // Legge un file .docx o .txt dalla cartella dati/ dello stesso repository GitHub Pages
-    async function caricaDocDaGithub() {
-      const fileName = document.getElementById("githubDocName").value.trim();
-      const status = document.getElementById("githubDocStatus");
-      if (!fileName) return alert("Scrivi il nome del file presente nella cartella dati/ (es. rosa.docx)");
-
-      status.textContent = "Caricamento da GitHub dati/" + fileName + "...";
-      try {
-        const response = await fetch(`./dati/${encodeURIComponent(fileName)}`);
-        if (!response.ok) throw new Error("File non trovato in dati/" + fileName);
-
-        if (fileName.endsWith(".docx")) {
-          const arrayBuffer = await response.arrayBuffer();
-          const result = await mammoth.extractRawText({ arrayBuffer });
-          testoEstrattoDaFile += "\n\n" + result.value.trim();
-        } else {
-          const txt = await response.text();
-          testoEstrattoDaFile += "\n\n" + txt.trim();
-        }
-        status.innerHTML = `<span class="pill-ok">File "dati/${fileName}" caricato e aggiunto al contesto!</span>`;
-      } catch (err) {
-        status.textContent = "Errore: " + err.message;
       }
     }
 
@@ -202,7 +211,7 @@
       const modalita = document.getElementById("modalita").value;
       const appunti = document.getElementById("appunti").value.trim();
 
-      if (!appunti && !testoEstrattoDaFile) {
+      if (!appunti && !testoDocGithub && !testoFileLocale) {
         return alert("Inserisci degli appunti oppure carica un file Word prima di generare.");
       }
 
@@ -214,12 +223,16 @@
 
 - CLIENTE: ${cliente}
 - MODALITÀ OPERATIVA: ${modalita}
-- APPUNTI DIRETTI: ${appunti || "Nessun appunto aggiuntivo"}
-- CONTENUTO ESTRATTO DA DOCUMENTO WORD/TESTO:
-${testoEstrattoDaFile || "Nessun documento allegato"}
+- APPUNTI DIRETTI DEL GIORNO: ${appunti || "Nessun appunto aggiuntivo"}
+
+- DOCUMENTO UFFICIALE CLIENTE (DATABASE GITHUB):
+${testoDocGithub || "Nessun database cliente caricato"}
+
+- DOCUMENTO EXTRA ALLEGATO AL MOMENTO:
+${testoFileLocale || "Nessun file extra allegato"}
 
 REGOLE DI PRODUZIONE:
-1. Calibra tono di voce, hashtag e formato sul cliente indicato:
+1. Calibra tono di voce, hashtag e formato sul cliente indicato e sulle informazioni presenti nel Documento Ufficiale Cliente:
    - Manfredonia Calcio 1932 — Prima Squadra: istituzionale, epico, orgoglio sipontino e biancoceleste, Stadio Miramare, Serie D Girone H.
    - Manfredonia Calcio — Settore Giovanile (U19/U17/U15/U14): educativo, coinvolgente per le famiglie, crescita, risultati e spirito di squadra.
    - Market Troiano (Via Gargano 148, Manfredonia): familiare, diretto, genuino, focus su qualità, salumeria e convenienza.
@@ -231,21 +244,34 @@ REGOLE DI PRODUZIONE:
 3. Non inventare mai orari, risultati, marcatori o dettagli non presenti nei dati forniti.`;
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        });
+        const modelli = ["gemini-3.8-flash", "gemini-3.8-flash-lite"];
+        let data = null;
+        let modelloUsato = "";
+        let ultimoErrore = "";
 
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error?.message || "Errore durante la chiamata a Gemini API");
+        for (const modello of modelli) {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modello}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }]
+            })
+          });
+
+          const json = await res.json();
+          if (res.ok) {
+            data = json;
+            modelloUsato = modello;
+            break;
+          }
+          ultimoErrore = json.error?.message || "Errore API";
         }
+
+        if (!data) throw new Error(ultimoErrore);
 
         const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Nessuna risposta ricevuta.";
         document.getElementById("outputBox").textContent = outputText;
+        document.getElementById("modelUsedBadge").textContent = `(Motore: ${modelloUsato})`;
         document.getElementById("resultCard").style.display = "block";
         document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
       } catch (err) {
